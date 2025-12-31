@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0px;
+            height: 100vh;
+            flex-wrap: wrap;
+            background-color: rgb(15, 15, 15);
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 70px;
+            width: 250px;
+            height: 350px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgb(255, 0, 0);
+            background-color: #760808; /* Background color instead of image */
+            transition: transform 0.5s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-content {
+            position: absolute;
+            bottom: 0;
+            padding: 15px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            text-align: center;
+            opacity: 0; /* Initially hide the content */
+            transform: translateY(100%); /* Position it offscreen initially */
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgb(244, 0, 0), 0 0 15px rgb(251, 253, 251);
+        }
+
+        .card:hover .card-content {
+            opacity: 1; /* Show content on hover */
+            transform: translateY(0); /* Bring the content to the visible area */
+        }
+
+        .card-content p {
+            margin: 10px 5;
+            font-size: 1.5rem;
+            font-weight: bolder;
+        }
+
+        .card-content button {
+            margin: 7px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .card-content button:hover {
+            background-color: rgb(109, 11, 11);
+        }
+
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+
+        .cards-container img{
+            height: 400px;
+            width: 100%;
+            object-fit: cover;
+       }
+
+        .category-buttons {
+            margin-top: 85px; /* Add space below the banner */
+            display: flex;
+            justify-content: center;
+        }
+
+        .category-buttons button {
+            margin: 5px;
+            padding: 10px 23px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #6e0b0b;
+            color: white;
+            box-shadow: 0px 4px 8px rgba(249, 249, 249, 0.432);
+        }
+
+        .category-buttons button:hover {
+            background-color: rgb(3, 3, 3);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .hidden {
+            opacity: 0;
+            transform: translateY(50px); /* Initial position for slide-in effect */
+        }
+
+        .slide-in {
+            animation: slideIn 0.8s ease-out forwards; /* Use 'forwards' to retain final state */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.5s ease, box-shadow 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgb(242, 235, 235);
+            padding: 70px; /* Increased padding */
+            max-width: 50%; /* Increase maximum width */
+            width: 50%; /* Set width to a larger percentage */
+            max-height: 50%; /* Ensure it doesn't overflow */
+            height: 40vh; /* Adjust height automatically */
+            overflow-y: auto; /* Add scrolling for large content */
+            align-items: center;
+            justify-content: center;
+            margin: 7%;
+            margin-bottom: 10%;
+            margin-left: 20%;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+        }
+
+        .modal-content button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: gray;
+            color: white;
+            cursor: pointer;
+            margin-top: 200px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content button:hover {
+            background-color: black;
+        }
+
+        .close-btn {
+            color: #322f2f;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 100px;
+            right: 250px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #event-banner {
+            position: fixed;
+            top: 0;
+            left: 0px;
+            width: 100%; /* Full width */
+            background-color: rgba(144, 17, 17, 0.9);
+            color: rgb(245, 234, 234);
+            padding: 0px 0px;
+            border-radius: 0; /* Remove rounded corners */
+            box-shadow: 0 4px 8px rgb(250, 248, 248);
+            font-size: 1.8rem;
+            text-align: center;
+            z-index: 1000;
+            line-height: 0;
+            transform: translateY(0); /* Default visible position */
+            transition: transform 0.3s ease-out; /* Smooth sliding effect */
+        }
+    </style>
+</head>
+<body>
+    <div id="event-banner">
+        <p>Events</p>
+    </div>
+
+    <div class="category-buttons">
+        <button onclick="filter('All')">All</button>
+        <button onclick="filter('tech')">Technical</button>
+        <button onclick="filter('culture')">Cultural</button>
+        <!-- <button onclick="filter('game')">Esports</button> -->
+        <button onclick="filter('miscellaneous')">Miscellaneous</button>
+    </div>
+    <div class="cards-container">
+        <div class="card tech">
+            <img src="wisdom.png">
+
+
+            <div class="card-content">
+               
+                <p>Wisdom Unplugged </p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card miscellaneous">
+            <img src="MIND BENDERS A live quiz event featuring questions from tech, GK, cartoons, movies, & more, with exciting prizes for the winners!.jpg">
+            <div class="card-content">
+                <p>Mind Benders</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card tech">
+            <img src="bytes brilliance.png">
+            <div class="card-content">
+                <p>Bytes of Brilliance</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card tech">
+            <img src="hackathon.png">
+            <div class="card-content">
+                <p>Eco Hackathons</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card miscellaneous">
+            <img src="respawn cup.png">
+            <div class="card-content">
+                <p>Respawn Cup</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card tech">
+            <img src="cryptic hunt.png">
+            <div class="card-content">
+                <p>Cryptic Hunt</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card tech">
+            <img src="crack code.png">
+            <div class="card-content">
+                <p>Crack the Code</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card tech">
+            <img src="invisible logic.png">
+            <div class="card-content">
+                <p>Invisible Logic</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card tech">
+            <img src="julia.png">
+            <div class="card-content">
+                <p>The Julia Workshops</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card culture">
+            <img src="spotlight saga.png">
+            <div class="card-content">
+                <p>Spotlight Saga</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card culture">
+            <img src="beyond beats.png">
+            <div class="card-content">
+                <p>Beyond Beats</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card culture">
+            <img src="voice of spectrum.jpg">
+            <div class="card-content">
+                <p>Voices of Spectrum</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card miscellaneous">
+            <img src="mic mischief.jpg">
+            <div class="card-content">
+                <p>Mic and Mischief</p>
+                <div>
+                    <button>Details</button>
+                    <button>Register</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for details -->
+    <div id="details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title">Event Title</h2>
+            <p id="modal-description">Event description goes here...</p>
+            <!-- <button onclick="registerEvent()">Register</button> -->
+        </div>
+    </div>
+
+    <script>
+        function filter(category) {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                if (category === 'All') {
+                    card.style.display = 'flex';
+                    observer.observe(card);
+                } else if (card.classList.contains(category)) {
+                    card.style.display = 'flex';
+                    observer.observe(card);
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('slide-in');
+                    entry.target.classList.remove('hidden');
+                } else {
+                    entry.target.classList.remove('slide-in');
+                    entry.target.classList.add('hidden');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.classList.add('hidden');
+            observer.observe(card);
+        });
+
+        function showDetails(eventTitle, eventDescription) {
+            document.getElementById('modal-title').innerText = eventTitle;
+            document.getElementById('modal-description').innerText = eventDescription;
+            document.getElementById('details-modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('details-modal').style.display = 'none';
+        }
+
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            const eventBanner = document.getElementById('event-banner');
+
+            if (currentScrollY > lastScrollY) {
+                eventBanner.style.transform = 'translateY(-100%)';
+                eventBanner.style.transition = 'transform 0.3s ease-out';
+            } else {
+                eventBanner.style.transform = 'translateY(0)';
+                eventBanner.style.transition = 'transform 0.3s ease-out';
+            }
+
+            lastScrollY = currentScrollY;
+        });
+
+        document.querySelectorAll('.card .card-content button:first-child').forEach((button, index) => {
+    button.addEventListener('click', function() {
+        // Fetch the details of each event
+        const eventTitles = [
+            "Wisdom Unplugged",
+            "Mind Benders",
+            "Bytes of Brilliance",
+            "Eco hackathons",
+            "Respawn cup",
+            "cryptic hunt",
+            "crack the code",
+            "invisible logic",
+            "The Julia workshops",
+            "spotlight saga",
+            "beyond beats",
+            "voices of spectrum",
+            "mic and mischief",
+            "tech talk",
+            "ideathon",
+            "drone Racing",
+            "video gaming",
+            "zunk yard competition",
+            "robo competition",
+            "dance competition",
+            "singing competition",
+            "rangoli competition",
+            "painting competition"
+        ];
+
+        const eventDescriptions = [
+            "A speaker event where a distinguished speaker shares profound insights on personal growth and societal impact.",
+            "A live quiz event featuring questions from tech, GK, cartoons, movies, &more, with exciting prizes for the winners!",
+            "A tech speaker session where industry experts share cutting-edge insights and innovations in the world of technology.",
+            "Description for Eco hackathons goes here.",
+            "Description for Respawn cup goes here.",
+            "Description for cryptic hunt goes here.",
+            "Description for crack the code goes here.",
+            "Description for invisible logic goes here.",
+            "Description for The Julia workshops goes here.",
+            "Description for spotlight saga goes here.",
+            "Description for beyond beats goes here.",
+            "Description for voices of spectrum goes here.",
+            "Description for mic and mischief goes here.",
+            "Description for tech talk goes here.",
+            "Description for ideathon goes here.",
+            "Description for drone Racing goes here.",
+            "Description for video gaming goes here.",
+            "Description for zunk yard competition goes here.",
+            "Description for robo competition goes here.",
+            "Description for dance competition goes here.",
+            "Description for singing competition goes here.",
+            "Description for rangoli competition goes here.",
+            "Description for painting competition goes here."
+        ];
+
+        // Show the details of the clicked card in the modal
+        showDetails(eventTitles[index], eventDescriptions[index]);
+    });
+});
+    </script>
+</body>
+</html>
